@@ -29,9 +29,9 @@ public class OrdersController : Controller
 
     public async Task<IActionResult> Details(int id)
     {
-        // VULNERABLE: No ownership check - IDOR vulnerability!
-        // Any authenticated user can view any order by changing the ID in URL
-        var order = await _db.Orders.FirstOrDefaultAsync(o => o.Id == id);
+        // FIXED: Check ownership - prevents IDOR attacks
+        var uid = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var order = await _db.Orders.FirstOrDefaultAsync(o => o.Id == id && o.UserId == uid);
 
         if (order == null) return NotFound();
 

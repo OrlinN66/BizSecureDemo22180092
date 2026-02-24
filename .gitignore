@@ -1,0 +1,35 @@
+## Visual Studio / .NET
+
+# Build outputs
+bin/
+obj/
+
+# Visual Studio settings
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# User secrets (never commit these!)
+secrets.json
+appsettings.Secrets.json
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# OS generated
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Published output
+publish/

@@ -1,0 +1,18 @@
+@model BizSecureDemo22180092.Models.Order
+@{
+    ViewData["Title"] = "Детайли";
+}
+
+<div class="card p-3 shadow-sm" style="max-width:680px;">
+    <div><b>Order ID:</b> @Model.Id</div>
+    <div><b>Собственик (UserId):</b> @Model.UserId</div>
+
+    @* Ex 2 FIX: Use @Model.Title (Razor auto-escapes) instead of @Html.Raw(Model.Title)
+       VULNERABLE version before fix: <div><b>Заглавие:</b> @Html.Raw(Model.Title)</div>  *@
+    <div><b>Заглавие:</b> @Model.Title</div>
+
+    <div><b>Сума:</b> @Model.Amount лв.</div>
+    <div><b>Дата:</b> @Model.CreatedAtUtc.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</div>
+    <hr />
+    <a class="btn btn-outline-secondary" asp-controller="Home" asp-action="Index">Назад</a>
+</div>

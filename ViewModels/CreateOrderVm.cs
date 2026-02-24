@@ -4,8 +4,8 @@ namespace BizSecureDemo22180092.ViewModels;
 
 public class CreateOrderVm
 {
-    // VULNERABLE: MaxLength 300 allows long XSS payloads
-    [Required, MaxLength(300)]
+    // FIXED: Reduced MaxLength to 80 - limits XSS payload length
+    [Required, MaxLength(80)]
     public string Title { get; set; } = "";
 
     [Required]

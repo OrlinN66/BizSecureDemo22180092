@@ -29,10 +29,9 @@ public class OrdersController : Controller
 
     public async Task<IActionResult> Details(int id)
     {
-        // Ex 1 FIX: Check ownership (IDOR vulnerability fixed by adding && o.UserId == uid)
-        // VULNERABLE version (before fix): var order = await _db.Orders.FirstOrDefaultAsync(o => o.Id == id);
-        var uid = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        var order = await _db.Orders.FirstOrDefaultAsync(o => o.Id == id && o.UserId == uid);
+        // VULNERABLE: No ownership check - IDOR vulnerability!
+        // Any authenticated user can view any order by changing the ID in URL
+        var order = await _db.Orders.FirstOrDefaultAsync(o => o.Id == id);
 
         if (order == null) return NotFound();
 

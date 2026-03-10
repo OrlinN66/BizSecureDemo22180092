@@ -1,23 +1,28 @@
 @model List<Order>
 
 @{
-    ViewData["Title"] = "Search Results";
+    ViewData["Title"] = "Search Orders";
 }
 
 <div class="container mt-5">
-    <h2>Search Results (SQL Injection Vulnerable)</h2>
+    <h2>Search Orders</h2>
     
     <form method="get" asp-action="SearchVulnerable" class="mb-4">
         <div class="input-group">
             <input type="text" name="keyword" class="form-control" placeholder="Search by title or amount..." />
-            <button type="submit" class="btn btn-danger">Search (Vulnerable)</button>
-            <a href="@Url.Action("SearchFixed", "Orders")" class="btn btn-success ms-2">Try Fixed Version</a>
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-search"></i> Search
+            </button>
         </div>
     </form>
 
     @if (Model?.Count > 0)
     {
-        <table class="table table-striped">
+        <div class="alert alert-success">
+            Found @Model.Count result(s)
+        </div>
+        
+        <table class="table table-striped table-hover">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -45,12 +50,8 @@
     }
     else
     {
-        <div class="alert alert-info">No results found.</div>
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> No results found. Try a different search term.
+        </div>
     }
-
-    <hr />
-    <div class="alert alert-danger">
-        <strong>⚠️ WARNING:</strong> This search method is vulnerable to SQL Injection!<br />
-        Try entering: <code>%' OR '1'='1</code> or <code>%' UNION SELECT * FROM aspnetusers--</code>
-    </div>
 </div>

@@ -39,15 +39,12 @@ public class OrdersController : Controller
         return View(order);
     }
 
-    // VULNERABLE: SQL Injection - String concatenation
-    public async Task<IActionResult> SearchVulnerable(string? keyword)
+    public async Task<IActionResult> Search(string? keyword)
     {
         if (string.IsNullOrEmpty(keyword))
             return View("SearchResults", new List<Order>());
 
         var uid = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        
-        // VULNERABLE: Direct string concatenation - SQL Injection risk!
         var query = $"SELECT * FROM Orders WHERE UserId = {uid} AND (Title LIKE '%{keyword}%' OR Amount LIKE '%{keyword}%')";
         
         var results = await _db.Orders.FromSqlRaw(query).ToListAsync();

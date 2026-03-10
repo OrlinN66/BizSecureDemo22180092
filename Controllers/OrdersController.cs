@@ -21,7 +21,8 @@ public class OrdersController : Controller
         if (!ModelState.IsValid) return RedirectToAction("Index", "Home");
 
         var uid = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        _db.Orders.Add(new Order { UserId = uid, Title = vm.Title, Amount = vm.Amount });
+        _db.
+        Orders.Add(new Order { UserId = uid, Title = vm.Title, Amount = vm.Amount });
         await _db.SaveChangesAsync();
 
         return RedirectToAction("Index", "Home");
@@ -51,23 +52,5 @@ public class OrdersController : Controller
         
         var results = await _db.Orders.FromSqlRaw(query).ToListAsync();
         return View("SearchResults", results);
-    }
-
-    // FIXED: SQL Injection - Using parameterized queries
-    public async Task<IActionResult> SearchFixed(string? keyword)
-    {
-        if (string.IsNullOrEmpty(keyword))
-            return View("SearchResultsFixed", new List<Order>());
-
-        var uid = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        
-        // FIXED: Using parameterized queries with FromSqlRaw
-        var searchPattern = $"%{keyword}%";
-        var results = await _db.Orders.FromSqlRaw(
-            "SELECT * FROM Orders WHERE UserId = {0} AND (Title LIKE {1} OR CAST(Amount AS VARCHAR) LIKE {1})",
-            uid, searchPattern
-        ).ToListAsync();
-        
-        return View("SearchResultsFixed", results);
     }
 }

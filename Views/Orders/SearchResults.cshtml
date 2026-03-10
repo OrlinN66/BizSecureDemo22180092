@@ -1,0 +1,56 @@
+@model List<Order>
+
+@{
+    ViewData["Title"] = "Search Results";
+}
+
+<div class="container mt-5">
+    <h2>Search Results (SQL Injection Vulnerable)</h2>
+    
+    <form method="get" asp-action="SearchVulnerable" class="mb-4">
+        <div class="input-group">
+            <input type="text" name="keyword" class="form-control" placeholder="Search by title or amount..." />
+            <button type="submit" class="btn btn-danger">Search (Vulnerable)</button>
+            <a href="@Url.Action("SearchFixed", "Orders")" class="btn btn-success ms-2">Try Fixed Version</a>
+        </div>
+    </form>
+
+    @if (Model?.Count > 0)
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Amount</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model)
+                {
+                    <tr>
+                        <td>@order.Id</td>
+                        <td>@order.Title</td>
+                        <td>$@order.Amount</td>
+                        <td>
+                            <a href="@Url.Action("Details", "Orders", new { id = order.Id })" class="btn btn-sm btn-primary">
+                                View Details
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-info">No results found.</div>
+    }
+
+    <hr />
+    <div class="alert alert-danger">
+        <strong>⚠️ WARNING:</strong> This search method is vulnerable to SQL Injection!<br />
+        Try entering: <code>%' OR '1'='1</code> or <code>%' UNION SELECT * FROM aspnetusers--</code>
+    </div>
+</div>

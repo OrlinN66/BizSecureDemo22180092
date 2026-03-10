@@ -1,0 +1,65 @@
+@model List<Order>
+
+@{
+    ViewData["Title"] = "Search Results (Fixed)";
+}
+
+<div class="container mt-5">
+    <h2>Search Results (SQL Injection - FIXED)</h2>
+    
+    <form method="get" asp-action="SearchFixed" class="mb-4">
+        <div class="input-group">
+            <input type="text" name="keyword" class="form-control" placeholder="Search by title or amount..." />
+            <button type="submit" class="btn btn-success">Search (Fixed)</button>
+            <a href="@Url.Action("SearchVulnerable", "Orders")" class="btn btn-danger ms-2">Try Vulnerable Version</a>
+        </div>
+    </form>
+
+    @if (Model?.Count > 0)
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Amount</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model)
+                {
+                    <tr>
+                        <td>@order.Id</td>
+                        <td>@order.Title</td>
+                        <td>$@order.Amount</td>
+                        <td>
+                            <a href="@Url.Action("Details", "Orders", new { id = order.Id })" class="btn btn-sm btn-primary">
+                                View Details
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-info">No results found.</div>
+    }
+
+    <hr />
+    <div class="alert alert-success">
+        <strong>✅ SAFE:</strong> This search method uses parameterized queries (parameterized SQL injection protection).<br />
+        Input is treated as a parameter, not as SQL code. Injection attempts will be treated as literal strings and will not execute.
+    </div>
+    
+    <div class="alert alert-info">
+        <h5>How Parameterization Protects:</h5>
+        <ul>
+            <li>User input is sent separately from SQL structure</li>
+            <li>Database driver treats input as data, never as SQL code</li>
+            <li>Malicious SQL characters are automatically escaped</li>
+        </ul>
+    </div>
+</div>

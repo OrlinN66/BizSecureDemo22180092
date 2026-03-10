@@ -39,15 +39,20 @@ public class OrdersController : Controller
         return View(order);
     }
 
+    // FIXED: SQL Injection - Using parameterized queries
     public async Task<IActionResult> Search(string? keyword)
     {
         if (string.IsNullOrEmpty(keyword))
             return View("SearchResults", new List<Order>());
 
         var uid = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        var query = $"SELECT * FROM Orders WHERE Title LIKE '%{keyword}%'";
         
-        var results = await _db.Orders.FromSqlRaw(query).ToListAsync();
+        // FIXED: Using parameterized queries to prevent SQL Injection
+        var searchPattern = $"%{keyword}%";
+        var results = await _db.Orders
+            .FromSqlRaw("SELECT * FROM Orders WHERE UserId = {0} AND Title LIKE {1}", uid, searchPattern)
+            .ToListAsync();
+        
         return View("SearchResults", results);
     }
 }

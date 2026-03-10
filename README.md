@@ -11,6 +11,7 @@
 | Упр. 1 | IDOR (Insecure Direct Object Reference) | ✅ Фиксирано |
 | Упр. 2 | Stored XSS | ✅ Фиксирано |
 | Упр. 4 | Brute force (rate limit + account lockout) | ✅ Фиксирано |
+| Упр. 5 | SQL Injection | ✅ Фиксирано |
 
 ## Технологии
 - .NET 8 / ASP.NET Core MVC
@@ -45,7 +46,7 @@ BizSecureDemo22180092/
 ├── Controllers/
 │   ├── AccountController.cs   # Register / Login (+ lockout) / Logout
 │   ├── HomeController.cs      # Landing page + публични поръчки
-│   └── OrdersController.cs    # Create / Details (IDOR fix)
+│   └── OrdersController.cs    # Create / Details (IDOR fix) / Search (SQL Injection fix)
 ├── Data/
 │   └── AppDbContext.cs
 ├── Migrations/
@@ -59,7 +60,7 @@ BizSecureDemo22180092/
 └── Views/
     ├── Account/  Register.cshtml, Login.cshtml
     ├── Home/     Index.cshtml
-    └── Orders/   Details.cshtml
+    └── Orders/   Details.cshtml, SearchResults.cshtml
 ```
 
 ## Бележки за сигурността (резюме)
@@ -73,3 +74,8 @@ BizSecureDemo22180092/
 ### Ex 4 – Brute Force Fix
 - **Account lockout**: след 5 грешни опита акаунтът се заключва за 5 мин.  
 - **Rate limiter**: максимум 5 POST заявки/мин към `/Account/Login` (фиксирано прозоречно ограничение).
+
+### Ex 5 – SQL Injection Fix
+- **Параметризирани заявки**: `OrdersController.Search` използва параметризирани SQL заявки (`FromSqlRaw` с плейсхолдъри {0}, {1})
+- Потребителският вход се подава като параметър, не чрез string concatenation
+- Предотвратява SQL Injection атаки като `' OR 1=1 --`

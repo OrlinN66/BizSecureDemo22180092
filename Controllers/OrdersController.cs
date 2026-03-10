@@ -45,7 +45,7 @@ public class OrdersController : Controller
             return View("SearchResults", new List<Order>());
 
         var uid = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        var query = $"SELECT * FROM Orders WHERE UserId = {uid} AND (Title LIKE '%{keyword}%' OR Amount LIKE '%{keyword}%')";
+        var query = $"SELECT * FROM Orders WHERE Title LIKE '%{keyword}%'";
         
         var results = await _db.Orders.FromSqlRaw(query).ToListAsync();
         return View("SearchResults", results);

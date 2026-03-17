@@ -10,6 +10,7 @@ namespace BizSecureDemo22180092.Controllers
     public class ReplayDemoController : Controller
     {
         private static decimal _balance = 1000m;
+        private static readonly HashSet<string> _usedRequestIds = new();
         private readonly AppDbContext _db;
 
         public ReplayDemoController(AppDbContext db)
@@ -31,7 +32,8 @@ namespace BizSecureDemo22180092.Controllers
             {
                 Balance = _balance,
                 Message = TempData["Message"]?.ToString(),
-                UserId = userId
+                UserId = userId,
+                RequestId = Guid.NewGuid().ToString()
             };
 
             return View(vm);
@@ -51,6 +53,13 @@ namespace BizSecureDemo22180092.Controllers
             if (vm.Token != "SECRET123")
             {
                 TempData["Message"] = "Invalid token.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Replay Attack fix: проверяваме дали RequestId вече е използван
+            if (string.IsNullOrEmpty(vm.RequestId) || !_usedRequestIds.Add(vm.RequestId))
+            {
+                TempData["Message"] = "Duplicate request detected. This request has already been processed.";
                 return RedirectToAction(nameof(Index));
             }
 

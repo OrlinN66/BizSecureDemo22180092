@@ -12,7 +12,7 @@
 | Упр. 2 | Stored XSS | ✅ Фиксирано |
 | Упр. 4 | Brute force (rate limit + account lockout) | ✅ Фиксирано |
 | Упр. 5 | SQL Injection | ✅ Фиксирано |
-| Упр. 6 | Replay Attack | ⚠️ Демонстрирано (умишлено уязвимо) |
+| Упр. 6 | Replay Attack | ✅ Фиксирано (RequestId nonce) |
 
 ## Упражнение 6 – Replay Attack
 
@@ -32,12 +32,39 @@
 2. Отвори **Burp Suite** → Proxy → изпрати заявка за теглене от браузъра
 3. В **Proxy History** намери `POST /ReplayDemo/Withdraw`
 4. Изпрати я в **Repeater** и натисни **Send** многократно
-5. Всяко повторение намалява баланса – въпреки че оригиналната заявка е само една
+5. Всяко повторение ще връща **"Duplicate request detected"** – балансът не се променя
 
-### Как се предотвратява
-- **Nonce** – случаен токен за еднократна употреба, съхранен в DB/кеш
+### Как е оправено
+Приложена е защита с **RequestId (nonce)**:
+
+**`ReplayDemoController.cs`**:
+```csharp
+private static readonly HashSet<string> _usedRequestIds = new();
+
+// При всяко GET генерираме нов уникален RequestId
+RequestId = Guid.NewGuid().ToString()
+
+// При POST проверяваме дали вече е използван
+if (string.IsNullOrEmpty(vm.RequestId) || !_usedRequestIds.Add(vm.RequestId))
+{
+    TempData["Message"] = "Duplicate request detected. This request has already been processed.";
+    return RedirectToAction(nameof(Index));
+}
+```
+
+**Принцип на работа:**
+1. При всяко зареждане на страницата сървърът генерира нов `RequestId` (GUID)
+2. `RequestId` се вгражда като hidden поле във формата
+3. При POST сървърът се опитва да добави `RequestId` в HashSet-а
+4. `HashSet.Add()` връща `false` ако елементът вече съществува → заявката се отхвърля
+5. Повторно изпратената заявка (replay) носи същия `RequestId` → **блокирана**
+
+**Защо работи срещу Replay Attack:**  
+Дори нападателят да прихване и препрати точно същата заявка, `RequestId`-ът в нея вече е бил регистриран при първото изпълнение и сървърът го отхвърля.
+
+### Как се предотвратява (генерални техники)
+- **Nonce / RequestId** ✅ *приложено* – уникален токен за еднократна употреба
 - **Timestamp** – заявки по-стари от N секунди се отхвърлят
-- **RequestId** – уникален идентификатор на заявка, проверяван за дубликати
 - **Cryptographic signature** – подпис включващ nonce + timestamp
 
 ## Технологии

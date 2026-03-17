@@ -11,4 +11,6 @@ public class ReplayDemoVm
     public decimal Amount { get; set; } = 100;
 
     public string Token { get; set; } = "SECRET123";
+
+    public string RequestId { get; set; } = "";
 }
